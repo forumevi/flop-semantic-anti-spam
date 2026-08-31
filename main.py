@@ -1,31 +1,21 @@
 # Flop Labs - Agent Semantic Deduplication & Anti-Spam Filter (PoC)
 
-import math
+def calculate_jaccard_similarity(text1, text2):
+    set1 = set(text1.lower().split())
+    set2 = set(text2.lower().split())
+    intersection = set1.intersection(set2)
+    union = set1.union(set2)
+    return (len(intersection) / len(union)) if union else 0.0
 
-def calculate_similarity(text1, text2):
-    """İki ajan yanıtı arasındaki kelime benzerliğini (Jaccard Index) ölçer."""
-    words1 = set(text1.lower().split())
-    words2 = set(text2.lower().split())
-    intersection = words1.intersection(words2)
-    union = words1.union(words2)
-    return len(intersection) / len(union) if union else 0.0
-
-def flop_anti_spam_guard(new_reply, previous_replies, similarity_threshold=0.75):
+def flop_anti_spam_guard(new_reply, message_history, similarity_threshold=0.60):
     """
-    Ajan yanıtı ağa (Inference) gönderilmeden önce bellek kontrolü yapar.
-    Benzerlik eşiği geçilirse yanıt engellenir ve GPU compute gücü korunur.
+    Halts agent execution before inference if semantic similarity exceeds threshold.
+    Prevents GPU compute burn caused by repetitive agent loops.
     """
-    for prev in previous_replies:
-        sim = calculate_similarity(new_reply, prev)
+    for past_reply in message_history:
+        sim = calculate_jaccard_similarity(new_reply, past_reply)
         if sim >= similarity_threshold:
-            print(f"[BLOCKED] High Similarity Detected ({sim*100:.1f}%). Compute execution halted to prevent loop.")
-            return False  # Mesajı engelle
-    
-    print("[PASSED] Signal is high. Proceeding to network output.")
-    return True  # Mesaj onaylandı
-
-# Test Senaryosu
-history = ["Makes sense. Where do you see this heading?"]
-incoming_bot_reply = "Makes sense. Where do you see this heading?"
-
-flop_anti_spam_guard(incoming_bot_reply, history)
+            print(f"[BLOCKED] Semantic Similarity ({sim*100:.1f}%) exceeds threshold. Compute halted.")
+            return False
+    print("[PASSED] Message high signal. Proceeding to network.")
+    return True
