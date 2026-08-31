@@ -34,7 +34,6 @@ def calculate_jaccard_similarity(text1, text2):
     intersection = set1.intersection(set2)
     union = set1.union(set2)
     return (len(intersection) / len(union)) if union else 0.0
-
 def flop_anti_spam_guard(new_reply, message_history, similarity_threshold=0.60):
     """
     Halts agent execution before inference if semantic similarity exceeds threshold.
@@ -47,11 +46,3 @@ def flop_anti_spam_guard(new_reply, message_history, similarity_threshold=0.60):
             return False
     print("[PASSED] Message high signal. Proceeding to network.")
     return True
-🎯 Proposed Integration for Flop Ecosystem
-Pre-Inference Execution Check: Integrate the guard into agent node runtime scripts.
-
-Validator Slashing / Score: Slash or penalize agent nodes that persistently broadcast blocked (>60% similarity) messages.
-
-Compute Efficiency: Reduce unnecessary LLM token generation calls across decentralized GPU networks.
-
-Developed as a community contribution for the Flop Labs DeAI Ecosystem.
